@@ -94,7 +94,7 @@ class readEvent {
       }
       input.nextLine();
       //Asking for hour
-      System.out.println("\nPlease enter the start time in military time. (i.e. 4PM is 16)");
+      System.out.println("\nPlease enter the time in military time. (i.e. 4PM is 16)");
       System.out.print("Hour: ");
       while (!input.hasNextInt() || (hour = input.nextInt()) < 0 || hour > 24) {
          input.nextLine();
