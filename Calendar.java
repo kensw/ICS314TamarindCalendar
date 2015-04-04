@@ -14,11 +14,19 @@ import java.io.*;
 *
 * INSTRUCTOR:           Brent Auernheimer
 *
+<<<<<<< HEAD
+* DATE:                 April 4, 2015
+*              
+* FILE:                 Calendar.java
+*      
+* DESCRIPTION:          Creates ics file from user input. Creates free time files
+=======
 * DATE:                 March 13, 2015
 *              
 * FILE:                 Calendar.java
 *      
 * DESCRIPTION:          Creates ics file from user input.
+>>>>>>> origin/master
 *
 *****************************************************************************/
 class Calendar {
@@ -27,10 +35,12 @@ class Calendar {
    public Calendar() {
       input = new Scanner(System.in);
    }
-   
-   public static class Event {
-      public String begin, version, calscale, publish, calname, timezone, begin2, dStart, dEnd, classType, location, summary, priority, end, end2, filename;
       
+   public static class Event {
+      public String begin, version, calscale, publish, calname, timezone, begin2,
+      dStart, dEnd, classType, location, summary, priority, end, end2, filename;
+   
+
       public Event() {
          begin = "BEGIN:VCALENDAR\n";
          version = "VERSION:2.0\n";
@@ -327,12 +337,59 @@ class Calendar {
       pw.write(event.begin + event.version + event.calscale + event.publish + event.calname + event.timezone + event.begin2 + event.dStart + event.dEnd + event.classType + event.location + event.summary + event.priority + event.end + event.end2);
       pw.close();
    }
+   
+   //Compares 2 military times as string
+   public static int compareTime(String t1, String t2){
+	   int t1h = Integer.valueOf(t1.substring(0, 1));
+	   int t1m = Integer.valueOf(t1.substring(2, 3));
+	   int t2h = Integer.valueOf(t2.substring(0, 1));
+	   int t2m = Integer.valueOf(t2.substring(2, 3));
+	   int result = 0;
+	   
+	   if(t1h < t2h){
+		   result = -1;
+	   }
+	   
+	   else if(t1h > t2h){
+		   result = 1;
+	   }
+	   
+	   //t1h = t2h
+	   else{
+		   if(t1m == t2m){
+			   result = 0;
+		   }
+		   
+		   else if(t1m < t2m){
+			   result = -1;
+		   }
+		   
+		   else if(t1m > t2m){
+			   result = 1;
+		   }
+	   }
+
+	   return result;	   
+   }
      
    public static void main(String[] args) throws IOException {            
       Calendar cal = new Calendar();
       int userChoice = 0;
       int start = 0;
-      
+      int startTime = 0;
+      int endTime = 0;
+      int prevStartTime = 0;
+      int prevEndTime = 0;
+      int count = 0;
+      String inputFilename, dtstart, dtend;
+      Scanner scan = null;
+      ArrayList<String> fileList = new ArrayList<String>();
+      ArrayList<Event> eventList = new ArrayList<Event>();
+      Event tempEvent = null;
+      String startTimeString, endTimeString, prevStartTimeString, prevEndTimeString;
+      String startDateString = null;
+      String endDateString = null;
+     
       System.out.println("Welcome!");
       //if they want to create an event
       while ((start = cal.startUp()) == 1 || start == 2) {
@@ -353,7 +410,149 @@ class Calendar {
          }
          //if they want to compute free times between events
          else {
+        	//Retrieve file w list of events
+            System.out.println("Please enter a file containing a list of calendar events:");
+            inputFilename = input.nextLine();
+            scan = new Scanner(new File(inputFilename));
             
+            //Storing ics filenames
+            while(scan.hasNext()){
+            	fileList.add(scan.nextLine());
+            }
+
+            //Process ics files
+            for(int i = 0; i < fileList.size(); i++){
+            	scan = new Scanner(new File(fileList.get(i)));
+            	
+            	//go to  BEGIN:VEVENT
+            	while((scan.nextLine().compareTo("BEGIN:VEVENT")) != 0){}
+            	dtstart = scan.next();
+            	dtend = scan.next();
+            	startDateString = dtstart;
+            	endDateString = dtend;
+            	//System.out.println("start: " + dtstart);
+            	//System.out.println("end: " + dtend);
+            	
+            	//remove date and T, z
+            	dtstart = dtstart.substring(17, 21);
+            	dtend = dtend.substring(15, 19);
+            	//System.out.println("start: " + dtstart);
+            	//System.out.println("end: " + dtend);
+            	           	
+            	//Store event w start and end times
+            	tempEvent = new Event();
+            	tempEvent.setStart(dtstart);
+            	tempEvent.setEnd(dtend);
+            	eventList.add(tempEvent);
+            }
+            
+            //Sort events according to start time by insertion sort
+            for(int i = 0; i < eventList.size(); i++){
+            	tempEvent = eventList.get(i);
+            	
+            	//(compareTime(eventList.get(i).dStart, eventList.get(j).dStart) == -1)
+            	//tempEvent.dStart = start time of event i
+            	//eventList.get(j).dStart = start time of event j
+            	int j;
+            	for(j = i - 1; j >= 0 && (compareTime(tempEvent.dStart, eventList.get(j).dStart) == -1); j--){
+            		eventList.set(j + 1, eventList.get(j));            	           		
+            	}
+            	
+            	eventList.set(j + 1, tempEvent);           	
+            }
+            
+            //test print
+            //for(int i = 0; i < eventList.size(); i++){
+            	//System.out.println(eventList.get(i).dStart);
+            //} 
+            
+            //trim off time and z
+            startDateString = startDateString.substring(0, 17);
+            endDateString = endDateString.substring(0, 15);
+            
+            //generate free time slots
+            for(int i = 0; i < eventList.size(); i++){
+            	tempEvent = new Event();
+            	startTimeString = eventList.get(i).dStart;
+            	endTimeString = eventList.get(i).dEnd;
+            	startTime = Integer.valueOf(startTimeString);
+            	endTime = Integer.valueOf(endTimeString);
+            	
+            	//Start section
+            	if(i == 0){           	
+                	if(startTime != 0){
+                		tempEvent.setStart(startDateString + "000000Z\n");
+                		tempEvent.setEnd(endDateString + startTimeString + "00Z\n");
+                	}
+                	
+                	//Set rest of free file fields
+            		tempEvent.setLocation("LOCATION:NA\n");
+            		tempEvent.setPriority("PRIORITY:NA\n");
+            		tempEvent.setSummary("SUMMARY:FREE TIME\n");
+            		tempEvent.setVisibility("CLASS:PUBLIC\n");
+            		tempEvent.setFilename("Free" + count + ".ics");
+            		       		
+                	//Create file
+                	cal.createFile(tempEvent);
+                	
+            		//Number of free files
+            		count++; 
+            	}
+            	
+            	//Not first section
+            	else{
+            		
+            		//Middle section
+                	prevStartTimeString = eventList.get(i - 1).dStart;
+                	prevEndTimeString = eventList.get(i - 1).dEnd;
+                	prevStartTime = Integer.valueOf(prevStartTimeString);
+                	prevEndTime = Integer.valueOf(prevEndTimeString);
+                	
+                	//No free time
+            		if(prevEndTime == startTime){}
+            		
+            		else{
+            			tempEvent.setStart(startDateString + prevEndTimeString + "00Z\n");
+            			tempEvent.setEnd(endDateString + startTimeString + "00Z\n");
+            		}
+            		
+                	//Set rest of free file fields
+            		tempEvent.setLocation("LOCATION:NA\n");
+            		tempEvent.setPriority("PRIORITY:NA\n");
+            		tempEvent.setSummary("SUMMARY:FREE TIME\n");
+            		tempEvent.setVisibility("CLASS:PUBLIC\n");
+            		tempEvent.setFilename("Free" + count + ".ics");
+            		       		
+                	//Create file
+                	cal.createFile(tempEvent);
+                	
+            		//Number of free files
+            		count++; 
+            		
+                	//End section, possibility of creating 2 files
+                	if(i == (eventList.size() - 1)){
+
+                    	//End section
+                		if(endTime != 24){
+                			tempEvent.setStart(startDateString + endTimeString + "00Z\n");
+                			tempEvent.setEnd(endDateString + "240000Z\n");
+    			
+                        	//Set rest of free file fields
+                    		tempEvent.setLocation("LOCATION:NA\n");
+                    		tempEvent.setPriority("PRIORITY:NA\n");
+                    		tempEvent.setSummary("SUMMARY:FREE TIME\n");
+                    		tempEvent.setVisibility("CLASS:PUBLIC\n");
+                    		tempEvent.setFilename("Free" + count + ".ics");
+                    		       		
+                        	//Create file
+                        	cal.createFile(tempEvent);
+                        	
+                    		//Number of free files
+                    		count++;
+                		}                 	
+                	}
+            	}        	
+            }
          }
       }
       //if they wanted to exit, they would hop out the loop
