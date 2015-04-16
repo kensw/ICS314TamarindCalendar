@@ -1,6 +1,8 @@
 import java.util.*;
 import java.io.*;
 
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /****************************************************************************
 * 
@@ -92,6 +94,8 @@ class Calendar {
    }
    
    public int startUp() {
+
+
       int userChoice = 0;
       System.out.println("What would you like to do?");
       System.out.println("[1] Create a calendar event");
@@ -255,7 +259,7 @@ class Calendar {
       //Create DT
       date = yearString + monthString + dayString;
       time = hourString + minuteString;    
-      result = result + date + "T" + time + "00Z\n";
+      result = result + date + "T" + time + "00\n";
       return result;
    }
    
@@ -481,8 +485,8 @@ class Calendar {
             	//Start section
             	if(i == 0){           	
                 	if(startTime != 0){
-                		tempEvent.setStart(startDateString + "000000Z\n");
-                		tempEvent.setEnd(endDateString + startTimeString + "00Z\n");
+                		tempEvent.setStart(startDateString + "000000\n");
+                		tempEvent.setEnd(endDateString + startTimeString + "00\n");
                 	}
                 	
                 	//Set rest of free file fields
@@ -512,8 +516,8 @@ class Calendar {
             		if(prevEndTime == startTime){}
             		
             		else{
-            			tempEvent.setStart(startDateString + prevEndTimeString + "00Z\n");
-            			tempEvent.setEnd(endDateString + startTimeString + "00Z\n");
+            			tempEvent.setStart(startDateString + prevEndTimeString + "00\n");
+            			tempEvent.setEnd(endDateString + startTimeString + "00\n");
             		}
             		
                 	//Set rest of free file fields
@@ -534,8 +538,8 @@ class Calendar {
 
                     	//End section
                 		if(endTime != 24){
-                			tempEvent.setStart(startDateString + endTimeString + "00Z\n");
-                			tempEvent.setEnd(endDateString + "240000Z\n");
+                			tempEvent.setStart(startDateString + endTimeString + "00\n");
+                			tempEvent.setEnd(endDateString + "240000\n");
     			
                         	//Set rest of free file fields
                     		tempEvent.setLocation("LOCATION:NA\n");
