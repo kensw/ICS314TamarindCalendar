@@ -1,4 +1,5 @@
 import static org.junit.Assert.*;
+import java.io.*;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -7,10 +8,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 public class CalendarTest {
 	
-	private Calendar StartUp;
+	private Calendar cal;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
@@ -22,7 +24,7 @@ public class CalendarTest {
 
 	@Before
 	public void setUp() throws Exception {
-		StartUp = new Calendar();
+		cal = new Calendar();
 	}
 
 	@After
@@ -30,90 +32,54 @@ public class CalendarTest {
 	}
 
 	@Test
-	public void testCalendar() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testStartUp() {
-		assertEquals(1, 1);
-		assertEquals(2, 2);
-		assertEquals(3, 3);
+
+		assertEquals(1, cal.startUp("1"));
+		assertEquals(2, cal.startUp("2"));
+		assertEquals(3, cal.startUp("3"));
+		assertEquals(4, cal.startUp("4"));
 	}
+	
 
 	@Test
 	public void testGetVisibility() {
-		assertEquals(1, 1);
-		assertEquals(2, 2);
-		assertEquals(3, 3);
+		assertEquals("CLASS:PUBLIC\n", cal.getVisibility("1"));
+		assertEquals("CLASS:PRIVATE\n", cal.getVisibility("2"));
+		assertEquals("CLASS:CONFIDENTIAL\n", cal.getVisibility("3"));
 	}
 
 	@Test
 	public void testGetDateTime() {
-		assertEquals("20150310T130000", "20150310130000");
+		fail("Not yet implemented");
 	}
 
 	@Test
 	public void testGetSummary() {		
-		String summary = "studying for finals";
-		assertEquals("studying for finals", summary);
-		
-		summary = "working on project";
-		assertEquals("working on project", summary);
+		assertEquals("SUMMARY: Studying for finals\n", cal.getSummary("Studying for finals"));
+		assertEquals("SUMMARY: Going to the beach\n", cal.getSummary("Going to the beach"));
 	}
 
 	@Test
 	public void testGetLocation() {
-		String location = "my house";
-		assertEquals("my house", location);
-		
-		location = "Hamilton Library";
-		assertEquals("Hamilton Library", location);
+		assertEquals("LOCATION: Hamilton Library\n", cal.getSummary("Hamilton Library"));
+		assertEquals("LOCATION: Home\n", cal.getSummary("Home"));
 	}
 
 	@Test
 	public void testGetPriority() {
-		System.out.println("\n********TESTING N/A[0]********: ");
-		Calendar cal = new Calendar();
-		String result = cal.getPriority();
-		assertEquals("PRIORITY:0\n", result);
-
-		System.out.println("\n********TESTING HIGH[1]********: ");
-		cal = new Calendar();
-		result = cal.getPriority();
-		assertEquals("PRIORITY:1\n", result);
-		
-		System.out.println("\n********TESTING MEDIUM[2]********: ");
-		cal = new Calendar();
-		result = cal.getPriority();
-		assertEquals("PRIORITY:5\n", result);
-		
-		System.out.println("\n********TESTING LOW[3]********: ");
-		cal = new Calendar();
-		result = cal.getPriority();
-		assertEquals("PRIORITY:9\n", result);
-		
-		
-	}
-
-	@Test
-	public void testGetFilename() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testCreateFile() {
-		fail("Not yet implemented");
+		assertEquals("PRIORITY:0\n", cal.getPriority("0"));
+		assertEquals("PRIORITY:1\n", cal.getPriority("1"));
+		assertEquals("PRIORITY:5\n", cal.getPriority("2"));
+		assertEquals("PRIORITY:9\n", cal.getPriority("3"));
 	}
 
 	@Test
 	public void testCompareTime() {
-		fail("Not yet implemented");
-	}
-
-	@Test
-	public void testMain() {
-		fail("Not yet implemented");
+		assertEquals(-1, cal.compareTime("1100","1200"));
+		assertEquals( 1, cal.compareTime("1100","1000"));
+		assertEquals(-1, cal.compareTime("1100","1101"));
+		assertEquals( 1, cal.compareTime("1101","1100"));
+		assertEquals( 0, cal.compareTime("1101","1101"));
 	}
 
 }
