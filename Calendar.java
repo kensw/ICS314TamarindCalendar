@@ -615,9 +615,9 @@ class Calendar {
                tempEvent.setSummary("SUMMARY:POSSIBLE MEETING TIME\n");
                tempEvent.setVisibility("CLASS:PUBLIC\n");
                tempEvent.setFilename("Common_Free_Times" + count + ".ics");
-               System.out.println("i: " + i + " j: " + j);
-               System.out.println("start: " + tempEvent.dStart);
-               System.out.println("end: " + tempEvent.dEnd);
+         //    System.out.println("i: " + i + " j: " + j);
+         //    System.out.println("start: " + tempEvent.dStart);
+         //    System.out.println("end: " + tempEvent.dEnd);
                cal.createFile(tempEvent);
                createF = false;
                //Number of free files
